@@ -17,10 +17,9 @@ You need your company's **slug**: the last part of your call link, `https://holl
 
 ### React Native
 
-```bash
-npm install @holline/react-native
-cd ios && pod install
-```
+The npm package isn't published yet. Email info@holline.cloud to get it, and don't install a package with this name from anywhere else until this line is gone.
+
+Once you have it, usage looks like this:
 
 ```ts
 import { Holline } from '@holline/react-native'
