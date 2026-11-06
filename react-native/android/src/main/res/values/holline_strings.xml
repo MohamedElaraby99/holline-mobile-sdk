@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="holline_close">اقفل</string>
+    <string name="holline_offline_title">مفيش اتصال بالإنترنت</string>
+    <string name="holline_offline_retry">حاول تاني</string>
+    <string name="holline_channel_name">المكالمات</string>
+    <string name="holline_notification_title">المكالمة شغالة</string>
+    <string name="holline_notification_text">دوس هنا عشان ترجع للمكالمة</string>
+</resources>

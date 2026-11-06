@@ -1,0 +1,24 @@
+apply plugin: "com.android.library"
+// Android Gradle Plugin 9 compiles Kotlin itself unless the host app turns that off.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.split("\\.")[0].toInteger()
+if (agpMajor < 9 || findProperty("android.builtInKotlin") == "false") {
+    apply plugin: "org.jetbrains.kotlin.android"
+}
+
+android {
+    namespace = "cloud.holline.sdk"
+    compileSdk = rootProject.ext.has("compileSdkVersion") ? rootProject.ext.get("compileSdkVersion") : 35
+
+    defaultConfig {
+        minSdk = rootProject.ext.has("minSdkVersion") ? rootProject.ext.get("minSdkVersion") : 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation "com.facebook.react:react-android"
+}

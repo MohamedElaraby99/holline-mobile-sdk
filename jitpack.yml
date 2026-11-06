@@ -1,0 +1,5 @@
+# JitPack builds the Android library from a tag. The Gradle project is in android/.
+jdk:
+  - openjdk17
+install:
+  - cd android && ./gradlew :holline-sdk:publishToMavenLocal

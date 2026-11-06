@@ -1,0 +1,29 @@
+{
+  "name": "@holline/react-native",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohamedElaraby99/holline-mobile-sdk.git",
+    "directory": "react-native"
+  },
+  "homepage": "https://holline.cloud/docs#mobile",
+  "description": "Open a company's Holline call screen inside a React Native app.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "android/build.gradle",
+    "android/src",
+    "ios",
+    "holline-react-native.podspec",
+    "react-native.config.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.73.0"
+  }
+}

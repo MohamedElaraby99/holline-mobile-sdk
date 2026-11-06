@@ -1,0 +1,11 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.dart_tool/
+.flutter-plugins*
+pubspec.lock
+.build/
+.swiftpm/
+node_modules/
