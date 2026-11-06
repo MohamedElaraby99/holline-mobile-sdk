@@ -22,3 +22,4 @@ copy_android flutter/android
 copy_android react-native/android
 cp "$ios_src" flutter/ios/holline_sdk/Sources/holline_sdk/Holline.swift
 cp "$ios_src" react-native/ios/Holline.swift
+cp LICENSE react-native/LICENSE
