@@ -28,6 +28,17 @@ public final class HollineSdkPlugin: NSObject, FlutterPlugin {
                 result(nil)
             case "isInCall":
                 result(Holline.isInCall)
+            case "joinMeeting", "isMeetingLink":
+                let args = call.arguments as? [String: Any] ?? [:]
+                if let base = args["baseUrl"] as? String, let url = URL(string: base) {
+                    Holline.baseURL = url
+                }
+                let link = args["link"] as? String ?? ""
+                if call.method == "isMeetingLink" {
+                    result(Holline.isMeetingLink(link))
+                } else {
+                    result(Holline.joinMeeting(link, name: args["name"] as? String))
+                }
             default:
                 result(FlutterMethodNotImplemented)
             }

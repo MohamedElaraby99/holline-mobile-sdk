@@ -26,6 +26,11 @@ class HollineSdkPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         when (call.method) {
             "open" -> open(call, result)
             "isInCall" -> result.success(Holline.isInCall)
+            "joinMeeting" -> joinMeeting(call, result)
+            "isMeetingLink" -> {
+                call.argument<String>("baseUrl")?.let { Holline.baseUrl = it }
+                result.success(Holline.isMeetingLink(call.argument<String>("link").orEmpty()))
+            }
             else -> result.notImplemented()
         }
     }
@@ -44,5 +49,16 @@ class HollineSdkPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         } catch (e: IllegalArgumentException) {
             result.error("invalid_company", e.message, null)
         }
+    }
+
+    private fun joinMeeting(call: MethodCall, result: MethodChannel.Result) {
+        call.argument<String>("baseUrl")?.let { Holline.baseUrl = it }
+        val link = call.argument<String>("link").orEmpty()
+        if (!Holline.isMeetingLink(link)) {
+            result.success(false)
+            return
+        }
+        Holline.joinMeeting(context, link, call.argument<String>("name"))
+        result.success(true)
     }
 }

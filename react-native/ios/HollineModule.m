@@ -11,6 +11,17 @@ RCT_EXTERN_METHOD(open:(NSString *)company
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(joinMeeting:(NSString *)link
+                  name:(NSString *)name
+                  baseUrl:(NSString *)baseUrl
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(isMeetingLink:(NSString *)link
+                  baseUrl:(NSString *)baseUrl
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(isInCall:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

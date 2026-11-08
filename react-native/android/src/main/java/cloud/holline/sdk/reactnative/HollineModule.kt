@@ -22,6 +22,23 @@ class HollineModule(context: ReactApplicationContext) : ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    fun joinMeeting(link: String, name: String?, baseUrl: String?, promise: Promise) {
+        if (baseUrl != null) Holline.baseUrl = baseUrl
+        if (!Holline.isMeetingLink(link)) {
+            promise.resolve(false)
+            return
+        }
+        Holline.joinMeeting(reactApplicationContext, link, name)
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun isMeetingLink(link: String, baseUrl: String?, promise: Promise) {
+        if (baseUrl != null) Holline.baseUrl = baseUrl
+        promise.resolve(Holline.isMeetingLink(link))
+    }
+
+    @ReactMethod
     fun isInCall(promise: Promise) {
         promise.resolve(Holline.isInCall)
     }

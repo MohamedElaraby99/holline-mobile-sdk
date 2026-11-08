@@ -37,6 +37,33 @@ final class HollineModule: RCTEventEmitter {
         }
     }
 
+    @objc(joinMeeting:name:baseUrl:resolve:reject:)
+    func joinMeeting(
+        _ link: String,
+        name: String?,
+        baseUrl: String?,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) {
+        Task { @MainActor in
+            if let baseUrl, let url = URL(string: baseUrl) { Holline.baseURL = url }
+            resolve(Holline.joinMeeting(link, name: name))
+        }
+    }
+
+    @objc(isMeetingLink:baseUrl:resolve:reject:)
+    func isMeetingLink(
+        _ link: String,
+        baseUrl: String?,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) {
+        Task { @MainActor in
+            if let baseUrl, let url = URL(string: baseUrl) { Holline.baseURL = url }
+            resolve(Holline.isMeetingLink(link))
+        }
+    }
+
     @objc(isInCall:reject:)
     func isInCall(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         Task { @MainActor in

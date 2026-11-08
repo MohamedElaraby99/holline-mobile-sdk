@@ -300,11 +300,23 @@ internal class HollineActivity : Activity() {
         /** Called from the page on a WebView thread. */
         @JavascriptInterface
         fun postMessage(message: String) {
+            // "Back to the app" on a meeting's last screen.
+            if (isClose(message)) {
+                runOnUiThread { if (!isDestroyed) finish() }
+                return
+            }
             val phase = parsePhase(message) ?: return
             runOnUiThread {
                 if (!isDestroyed) onPhase(phase)
             }
         }
+    }
+
+    private fun isClose(message: String): Boolean = try {
+        val json = JSONObject(message)
+        json.optString("source") == "holline" && json.optString("type") == "close"
+    } catch (_: JSONException) {
+        false
     }
 
     private fun parsePhase(message: String): String? = try {

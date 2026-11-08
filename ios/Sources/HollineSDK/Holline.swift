@@ -1,9 +1,10 @@
 import UIKit
 import WebKit
 
-/// Opens a company's Holline call screen inside the host app.
+/// Opens a company's Holline call screen, or one of its meetings, inside the host app.
 ///
 ///     Holline.open(company: "your-slug", name: user.name, phone: user.phone)
+///     Holline.joinMeeting(link, name: user.name)
 ///
 /// The host app's Info.plist must have `NSMicrophoneUsageDescription`, and
 /// `NSCameraUsageDescription` for companies with video calls.
@@ -13,14 +14,16 @@ public enum Holline {
     public static var baseURL = URL(string: "https://holline.cloud")!
 
     /// Called when the call moves on. Phases: flow, form, ringing, connected, ended,
-    /// missed, callback, moved, mic-error.
+    /// missed, callback, moved, mic-error. A meeting reports meeting-ready,
+    /// meeting-lobby, meeting-joined, meeting-left, meeting-ended, meeting-removed,
+    /// meeting-denied, meeting-full and meeting-missing.
     public static var onPhaseChanged: ((String) -> Void)?
 
     /// The current phase, or nil while the call screen isn't open.
     public private(set) static var phase: String?
 
-    /// True while a call is ringing or connected, even if the call screen is hidden.
-    public static var isInCall: Bool { phase == "ringing" || phase == "connected" }
+    /// True while a call is ringing or connected, or a meeting is joined, even if the screen is hidden.
+    public static var isInCall: Bool { phase == "ringing" || phase == "connected" || phase == "meeting-joined" }
 
     private static var controller: HollineViewController?
 
@@ -44,6 +47,29 @@ public enum Holline {
             assertionFailure("Holline: company must not be empty")
             return
         }
+        show(url, from: presenter)
+    }
+
+    /// Opens a Holline meeting from its link (https://holline.cloud/m/abcd-efgh-ijkl,
+    /// or /a/<company>/m/… when your app opens your company's links) or its bare code.
+    /// Like a call, a meeting in progress is never replaced.
+    ///
+    /// - Parameters:
+    ///   - link: The meeting link, as received (a Universal Link, a notification, a message).
+    ///   - name: Fills in the person's name, so they only tap to join.
+    ///   - presenter: Presents the screen. Defaults to the app's topmost view controller.
+    /// - Returns: false when `link` isn't a Holline meeting link.
+    @discardableResult
+    public static func joinMeeting(_ link: String, name: String? = nil, from presenter: UIViewController? = nil) -> Bool {
+        guard let url = meetingURL(link, name: name) else { return false }
+        show(url, from: presenter)
+        return true
+    }
+
+    /// Whether `link` is a Holline meeting link this SDK can open, for routing incoming links.
+    public static func isMeetingLink(_ link: String) -> Bool { meetingPath(link) != nil }
+
+    private static func show(_ url: URL, from presenter: UIViewController?) {
         if let current = controller, current.url != url, !isInCall {
             current.presentingViewController?.dismiss(animated: false)
             closed()
@@ -66,6 +92,38 @@ public enum Holline {
         controller?.stop()
         controller = nil
         phase = nil
+    }
+
+    /// The meeting's path on the site, from a link to it or its bare code; nil if it isn't one.
+    static func meetingPath(_ link: String) -> String? {
+        let text = link.trimmingCharacters(in: .whitespacesAndNewlines)
+        let code = "[a-z]{4}-[a-z]{4}-[a-z]{4}"
+        if text.lowercased().range(of: "^\(code)$", options: .regularExpression) != nil { return "/m/" + text.lowercased() }
+        guard let url = URL(string: text),
+              url.scheme?.lowercased() == baseURL.scheme?.lowercased(),
+              url.host?.lowercased() == baseURL.host?.lowercased(),
+              url.port == baseURL.port else { return nil }
+        var path = url.path.lowercased()
+        while path.hasSuffix("/") { path.removeLast() }
+        return path.range(of: "^/(a/[a-z0-9-]+/)?m/\(code)$", options: .regularExpression) != nil ? path : nil
+    }
+
+    /// The person's name goes in the fragment, which is never sent to the server.
+    static func meetingURL(_ link: String, name: String?) -> URL? {
+        guard let path = meetingPath(link) else { return nil }
+        var text = baseURL.absoluteString
+        while text.hasSuffix("/") { text.removeLast() }
+        text += path + "?sdk=1"
+        if let name, !name.trimmingCharacters(in: .whitespaces).isEmpty {
+            text += "#name=" + encode(name.trimmingCharacters(in: .whitespaces))
+        }
+        return URL(string: text)
+    }
+
+    /// Closes the screen when the page asks ("back to the app" after a meeting).
+    static func closeRequested() {
+        guard let screen = controller else { return }
+        screen.presentingViewController?.dismiss(animated: true) { closed() }
     }
 
     /// The customer's details go in the fragment, which is never sent to the server.
@@ -106,9 +164,12 @@ private final class PhaseHandler: NSObject, WKScriptMessageHandler {
               let text = message.body as? String,
               let data = text.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              json["source"] as? String == "holline",
-              json["type"] as? String == "phase",
-              let phase = json["phase"] as? String else { return }
+              json["source"] as? String == "holline" else { return }
+        if json["type"] as? String == "close" {
+            Holline.closeRequested()
+            return
+        }
+        guard json["type"] as? String == "phase", let phase = json["phase"] as? String else { return }
         Holline.update(phase: phase)
     }
 }

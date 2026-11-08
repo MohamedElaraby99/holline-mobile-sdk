@@ -1,5 +1,5 @@
 group = "cloud.holline.holline_sdk"
-version = "0.1.0"
+version = "0.2.0"
 
 apply plugin: "com.android.library"
 // Android Gradle Plugin 9 compiles Kotlin itself unless the host app turns that off.

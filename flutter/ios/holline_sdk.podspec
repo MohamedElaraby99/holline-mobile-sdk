@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'holline_sdk'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = "Open a company's Holline call screen inside a Flutter app."
   s.homepage         = 'https://holline.cloud'
   s.license          = { :type => 'MIT', :file => '../../LICENSE' }

@@ -9,3 +9,6 @@ pubspec.lock
 .build/
 .swiftpm/
 node_modules/
+
+# Kotlin compiler state from local builds
+.kotlin/

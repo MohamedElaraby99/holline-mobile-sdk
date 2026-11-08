@@ -10,6 +10,15 @@ export type HollinePhase =
   | 'callback'
   | 'moved'
   | 'mic-error'
+  | 'meeting-ready'
+  | 'meeting-lobby'
+  | 'meeting-joined'
+  | 'meeting-left'
+  | 'meeting-ended'
+  | 'meeting-removed'
+  | 'meeting-denied'
+  | 'meeting-full'
+  | 'meeting-missing'
 
 export interface HollineOpenOptions {
   /** The company's slug, from its Holline call link. */
@@ -21,6 +30,13 @@ export interface HollineOpenOptions {
   /** Shown as the call's source in analytics. Defaults to mobile_app. */
   source?: string
   /** Where the call screen is served from. Defaults to https://holline.cloud. */
+  baseUrl?: string
+}
+
+export interface HollineMeetingOptions {
+  /** Fills in the person's name, so they only tap to join. */
+  name?: string
+  /** Where meetings are served from. Defaults to https://holline.cloud. */
   baseUrl?: string
 }
 
@@ -44,7 +60,22 @@ export const Holline = {
     return module().open(company, name ?? null, phone ?? null, source ?? null, baseUrl ?? null)
   },
 
-  /** True while a call is ringing or connected, even if the call screen is hidden. */
+  /**
+   * Opens a Holline meeting from its link (https://holline.cloud/m/abcd-efgh-ijkl,
+   * or /a/<company>/m/… when your app opens your company's links) or its bare code.
+   * Resolves false when `link` isn't a Holline meeting link. A meeting in progress
+   * is never replaced.
+   */
+  joinMeeting(link: string, { name, baseUrl }: HollineMeetingOptions = {}): Promise<boolean> {
+    return module().joinMeeting(link, name ?? null, baseUrl ?? null)
+  },
+
+  /** Whether `link` is a Holline meeting link, for routing links your app receives. */
+  isMeetingLink(link: string, baseUrl?: string): Promise<boolean> {
+    return module().isMeetingLink(link, baseUrl ?? null)
+  },
+
+  /** True while a call is ringing or connected, or a meeting is joined, even if the screen is hidden. */
   isInCall(): Promise<boolean> {
     return module().isInCall()
   },

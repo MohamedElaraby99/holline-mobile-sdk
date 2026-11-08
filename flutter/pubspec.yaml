@@ -1,6 +1,6 @@
 name: holline_sdk
 description: Open a company's Holline call screen inside a Flutter app.
-version: 0.1.0
+version: 0.2.0
 publish_to: none
 
 environment:
